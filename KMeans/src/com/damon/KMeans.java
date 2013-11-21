@@ -16,24 +16,24 @@ public class KMeans {
 		data_ = data;
 		iteration_num_= iteration_num;
 	}
-	
+	//
 	private List<Cluster> preprocessCluster(Set<Point> centroids){
 		List<Cluster> clusters = new ArrayList<Cluster>();
 		Iterator<Point> it_p = centroids.iterator();
 		int id = 0;
 		while(it_p.hasNext()){
 			Point p = it_p.next();
-			if(p.isSample()){
-				Cluster c = new Cluster(id++,p);
+			if(p.isSample()){//if p is sample data, need to add it to cluster member;
+				Cluster c = new Cluster(id++,p,compute_method_);
 				c.addPoint(p);
 				clusters.add(c);
 			}else{
-				clusters.add(new Cluster(id++,p));
+				clusters.add(new Cluster(id++,p,compute_method_));
 			}
 		}
 		return clusters;
 	}
-	
+	//Cluster data by centroids;
 	private List<Cluster> clustering(Set<Point> centroids,List<Cluster> clusters){
 		//convert to array
 		//The below statement equal to Point centers [] = centroids.toArray(new Point[0]);
@@ -41,8 +41,10 @@ public class KMeans {
 		centers = centroids.toArray(centers);
 		TreeSet<Distance> dists = new TreeSet<Distance>();
 		boolean flag = false;
-		for(int i = 0; i < data_.size(); i++){
-			for(int j = 0; j < cluster_num_; j++){
+		int data_size = data_.size();
+		int cluster_num = clusters.size();
+		for(int i = 0; i < data_size; i++){
+			for(int j = 0; j < cluster_num; j++){
 				Point source = data_.get(i);
 				if(centroids.contains(source))
 					break;
@@ -73,12 +75,11 @@ public class KMeans {
 		return centroids;
 	}
 	
-	//Iteration
-	public List<Cluster> iteration(){
+	//Iterate to get the final clusters
+	public List<Cluster> getClusters(){
 		Set<Point> centroids = centroidInit();
 		List<Cluster> clusters = clustering(centroids,preprocessCluster(centroids));
 		Set<Point> new_centroids = new HashSet<Point>();
-		//List<Cluster> new_clusters = new ArrayList<Cluster>();
 		for(int i = 0; i < iteration_num_; i++){
 			int cluster_size = clusters.size();
 			for(int j = 0; j < cluster_size; j++){
@@ -91,6 +92,7 @@ public class KMeans {
 				}
 				new_centroids.add(new Point(x_sum/members_size,y_sum/members_size,false));
 			}
+			//stop iteration if the centroids do not change; 
 			if(new_centroids.containsAll(centroids))
 				break;
 			centroids = new_centroids;
@@ -99,7 +101,7 @@ public class KMeans {
 		return clusters;
 	}
 
-	public void PrintFinalClusters(List<Cluster> clusters){
+	public void PrintClusters(List<Cluster> clusters){
 		int size = clusters.size();
 		System.out.println("Clustering result:");
 		for(int i = 0; i < size; i++){
@@ -119,8 +121,9 @@ public class KMeans {
 		points.add(new Point(15,2));
 		points.add(new Point(2,2));
 		
-		KMeans k_means = new KMeans(3,points,10);
-		k_means.PrintFinalClusters(k_means.iteration());
+		KMeans k_means = new KMeans(2,points,10);
+		List<Cluster> clusters =  k_means.getClusters();
+		k_means.PrintClusters(clusters);
 	}
 
 }
