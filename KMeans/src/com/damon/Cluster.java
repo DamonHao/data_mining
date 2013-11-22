@@ -4,24 +4,24 @@ import java.text.DecimalFormat;
 
 public class Cluster {
 	private int id_;
-	private Point centroid_;
-	private ArrayList<Point> members_ = new ArrayList<Point>();
+	private DataVector centroid_;
+	private ArrayList<DataVector> members_ = new ArrayList<DataVector>();
 	private static DecimalFormat precision = new DecimalFormat("0.####");
-	private ComputeMethod compute_method_;
+	private DistanceMeasure compute_method_;
 	
-	public Cluster(int id, Point centroid,ComputeMethod compute_method){
+	public Cluster(int id, DataVector centroid,DistanceMeasure compute_method){
 		id_ = id;
-		centroid_ = new Point(centroid.getX(),centroid.getY());
+		centroid_ = new DataVector(centroid.getAllCoordiante(),false);
 		compute_method_ = compute_method;
 	}
-	public void addPoint(Point p){
-		members_.add(p);
+	public void addDataVector(DataVector v){
+		members_.add(v);
 	}
 	
-	public Point getCentroid(){
+	public DataVector getCentroid(){
 		return centroid_;
 	}
-	public List<Point> getMembers(){
+	public List<DataVector> getMembers(){
 		return members_;
 	}
 	public int getID(){
@@ -42,11 +42,17 @@ public class Cluster {
 	}
 	
     @Override  
-    public String toString() { 
+    public String toString() {
+    	String str = "(";
+    	int len = centroid_.getLenght();
+    	for(int i = 0; i < len-1; i++)
+    		str += precision.format(centroid_.getCoordiante(i))+",";
+    	if(len > 0)
+    		str += precision.format(centroid_.getCoordiante(len-1));
+    	str += ")";
         return "Cluster{" +  
                 "id=" + id_ +  
-                ", centroid=" + "("+ precision.format(centroid_.getX())+","
-                + precision.format(centroid_.getY())+")"+  
+                ", centroid=" + str+  
                 ", average radius="+precision.format(getAverageRadius())+
                 ", members=" + members_ +  
                 "}";  
